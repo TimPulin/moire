@@ -33,7 +33,11 @@
           />
         </ul>
 
-        <BasePagination />
+        <BasePagination
+          :pages-amount="pagesAmount"
+          v-model:page-current="pageCurrent"
+          @paginate="loadProducts"
+        />
       </section>
     </div>
   </div>
@@ -70,6 +74,7 @@ export default {
       formPriceTo: 0,
 
       pageCurrent: 1,
+      pagesAmount: 0,
       pageLimit: 12,
 
       productsAmount: null,
@@ -100,7 +105,8 @@ export default {
         })
         .then((response) => {
           this.products = response.data.items;
-          this.productsAmount = this.products.length;
+          this.productsAmount = response.data.pagination.total;
+          this.pagesAmount = response.data.pagination.pages;
           this.productAmountEnding = setProductsAmountEnding(
             this.productsAmount
           );
