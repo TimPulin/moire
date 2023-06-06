@@ -1,5 +1,11 @@
 <template>
-  <div>
+  <div class="loader" v-if="pageIsLoading">
+    <img
+      src="../../public/img/gif/moving-block.gif"
+      alt="изображение загрузчика страницы"
+    />
+  </div>
+  <div v-if="pageIsLoaded">
     <div class="content__top">
       <div class="content__row">
         <h1 class="content__title">Каталог</h1>
@@ -25,7 +31,18 @@
       />
 
       <section class="catalog">
-        <ul class="catalog__list">
+        <div class="loader" v-if="productsIsLoading">
+          <img
+            src="../../public/img/gif/moving-block.gif"
+            alt="изображение загрузчика страницы"
+          />
+        </div>
+
+        <div class="loader" v-if="productsLoadFault">
+          <span>Произошла ошибка во время загрузки товаров</span>
+        </div>
+
+        <ul v-if="productsIsLoaded" class="catalog__list">
           <ProductItem
             v-for="product in products"
             :key="product.id"
@@ -59,12 +76,12 @@ export default {
   },
   data() {
     return {
-      products: null,
+      products: [],
 
-      productColors: null,
-      productMaterials: null,
-      productCollections: null,
-      productCategories: null,
+      productColors: [],
+      productMaterials: [],
+      productCollections: [],
+      productCategories: [],
 
       formColorId: [],
       formMaterialId: [],
@@ -77,19 +94,41 @@ export default {
       pagesAmount: 0,
       pageLimit: 12,
 
-      productsAmount: null,
+      productsAmount: 0,
       productsAmountEnding: 'товаров',
+
+      pageIsLoading: false,
+      pageIsLoaded: true,
+
+      productsIsLoading: false,
+      productsIsLoaded: true,
+      productsLoadFault: false,
     };
   }, // data
   created() {
-    this.loadProducts();
-    this.loadColors();
-    this.loadMaterials();
-    this.loadCollections();
-    this.loadCategories();
+    this.loaderPage([
+      this.loadProducts(),
+      this.loadColors(),
+      this.loadMaterials(),
+      this.loadCollections(),
+      this.loadCategories(),
+    ]);
   },
   methods: {
+    async loaderPage(arrRequests) {
+      this.pageIsLoading = true;
+      this.pageIsLoaded = false;
+
+      await Promise.all(arrRequests);
+
+      this.pageIsLoading = false;
+      this.pageIsLoaded = true;
+    },
     loadProducts() {
+      this.productsIsLoading = true;
+      this.productsIsLoaded = false;
+      this.productsLoadFault = false;
+
       axios
         .get(`${API_BASE_URL}/products`, {
           params: {
@@ -110,35 +149,91 @@ export default {
           this.productAmountEnding = setProductsAmountEnding(
             this.productsAmount
           );
+
+          this.productsIsLoading = false;
+          this.productsIsLoaded = true;
+          this.productsLoadFault = false;
+        })
+        .catch((error) => {
+          console.log(`load products - ${error.message}`);
+          this.products = [];
+          this.productsAmount = 0;
+          this.pagesAmount = 0;
+          this.productAmountEnding = 'товаров';
+
+          this.productsIsLoading = false;
+          this.productsIsLoaded = false;
+          this.productsLoadFault = true;
         });
     },
     loadColors() {
-      axios.get(`${API_BASE_URL}/colors`).then((response) => {
-        this.productColors = formatObjectOfStrings(
-          response.data.items,
-          'title'
-        );
-      });
+      axios
+        .get(`${API_BASE_URL}/colors`)
+        .then((response) => {
+          this.productColors = formatObjectOfStrings(
+            response.data.items,
+            'title'
+          );
+        })
+        .catch((error) => {
+          console.log(`load colors - ${error.message}`);
+          this.productColors = [];
+        });
     },
     loadMaterials() {
-      axios.get(`${API_BASE_URL}/materials`).then((response) => {
-        this.productMaterials = response.data.items;
-      });
+      axios
+        .get(`${API_BASE_URL}/materials`)
+        .then((response) => {
+          this.productMaterials = response.data.items;
+        })
+        .catch((error) => {
+          console.log(`load materials - ${error.message}`);
+          this.productMaterials = [];
+        });
     },
     loadCollections() {
-      axios.get(`${API_BASE_URL}/seasons`).then((response) => {
-        this.productCollections = response.data.items;
-      });
+      axios
+        .get(`${API_BASE_URL}/seasons`)
+        .then((response) => {
+          this.productCollections = response.data.items;
+        })
+        .catch((error) => {
+          console.log(`load collections - ${error.message}`);
+          this.productCollections = [];
+        });
     },
     loadCategories() {
-      axios.get(`${API_BASE_URL}/productCategories`).then((response) => {
-        this.productCategories = formatObjectOfStrings(
-          response.data.items,
-          'title'
-        );
-      });
+      axios
+        .get(`${API_BASE_URL}/productCategories`)
+        .then((response) => {
+          this.productCategories = formatObjectOfStrings(
+            response.data.items,
+            'title'
+          );
+        })
+        .catch((error) => {
+          console.log(`load categories - ${error.message}`);
+          this.productCategories = [];
+        });
     },
   }, // methods
 };
 // TODO поставить условие isItemsReady = false, крутить спинер, когда данные загрузятся - поменять false на true, после начать отрисовку
 </script>
+
+<style>
+.loader {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.loader__message {
+  position: relative;
+  left: 50%;
+  display: inline-block;
+  transform: translateX(-50%);
+}
+</style>
