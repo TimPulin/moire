@@ -6,7 +6,6 @@
         type="radio"
         :value="colorObj.color.code"
         v-model="localPickedColor"
-        @click="sendParams"
       />
       <span
         class="colors__value"
