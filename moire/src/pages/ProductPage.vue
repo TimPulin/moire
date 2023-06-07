@@ -6,7 +6,7 @@
     />
 
     <div v-if="pageIsLoaded" class="content__top">
-      <BaseBreadcrumbs />
+      <BaseBreadcrumbs :arr-sections="[category, product]" />
     </div>
 
     <section v-if="pageIsLoaded" class="item">
@@ -100,9 +100,12 @@
 <script>
 import axios from 'axios';
 import API_BASE_URL from '@/config';
+
 import setImgSrcMixin from '@/mixins/set-img-src';
 import loadingProcessMixin from '@/mixins/loading-process';
+
 import renderProductPrice from '@/helpers/render-product-price';
+
 import BaseBreadcrumbs from '@/components/base/BaseBreadcrumbs.vue';
 import BaseSelect from '@/components/base/BaseSelect.vue';
 import ProductItemColor from '@/components/product/ProductItemColor.vue';
@@ -160,7 +163,9 @@ export default {
         .get(`${API_BASE_URL}/products/${this.$route.params.id}`)
         .then((respose) => {
           this.product = respose.data;
+          this.product.routeName = 'product';
           this.category = respose.data.category;
+          this.category.routeName = 'category';
           this.pickedColorId = respose.data.colors[0].id;
           this.pickedSizeId = respose.data.sizes[0].id;
           this.setImgSrc(0);

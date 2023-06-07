@@ -5,14 +5,19 @@
         Каталог
       </router-link>
     </li>
-    <li class="breadcrumbs__item">
-      <router-link class="breadcrumbs_link" :to="{ name: 'main' }">
-        {{ categoryTitle }}
-      </router-link>
-    </li>
-    <li class="breadcrumbs__item">
-      <a href="#" class="breadcrumbs_link">
-        {{ productTitle }}
+    <li
+      class="breadcrumbs__item"
+      v-for="(item, index) in arrSections"
+      :key="index"
+    >
+      <router-link
+        v-if="isShow(index)"
+        class="breadcrumbs_link"
+        :to="{ name: item.routeName, params: { id: item.slug } }"
+        >{{ item.title }}</router-link
+      >
+      <a v-else class="breadcrumbs_link">
+        {{ item.title }}
       </a>
     </li>
   </ul>
@@ -22,9 +27,18 @@
 <script>
 export default {
   props: {
-    categoryId: Number,
-    categoryTitle: String,
-    productTitle: String,
+    arrSections: Array,
+  },
+  methods: {
+    isShow(index) {
+      return index !== this.arrSections.length - 1;
+    },
   },
 };
 </script>
+
+<style>
+.link--disabled {
+  cursor: not-allowed;
+}
+</style>
