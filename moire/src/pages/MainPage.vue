@@ -1,10 +1,4 @@
 <template>
-  <div class="loader" v-if="pageIsLoading">
-    <img
-      src="../../public/img/gif/moving-block.gif"
-      alt="изображение загрузчика страницы"
-    />
-  </div>
   <div v-if="pageIsLoaded">
     <div class="content__top">
       <div class="content__row">
@@ -31,16 +25,10 @@
       />
 
       <section class="catalog">
-        <div class="loader" v-if="productsIsLoading">
-          <img
-            src="../../public/img/gif/moving-block.gif"
-            alt="изображение загрузчика страницы"
-          />
-        </div>
-
-        <div class="loader" v-if="productsLoadFault">
-          <span>Произошла ошибка во время загрузки товаров</span>
-        </div>
+        <BasePreloaderSmall
+          :productsIsLoading="productsIsLoading"
+          :productsLoadFault="productsLoadFault"
+        />
 
         <ul v-if="productsIsLoaded" class="catalog__list">
           <ProductItem
@@ -63,17 +51,24 @@
 <script>
 import axios from 'axios';
 import API_BASE_URL from '@/config';
+import loadingProcessMixin from '@/mixins/loading-process';
+
 import setProductsAmountEnding from '@/helpers/set-product-amount-ending';
 import formatObjectOfStrings from '@/helpers/format-object-of-strings';
+
 import ProductFilter from '@/components/product/ProductFilter.vue';
 import ProductItem from '@/components/product/ProductItem.vue';
 import BasePagination from '@/components/base/BasePagination.vue';
+import BasePreloaderSmall from '@/components/base/BasePreloaderSmall.vue';
+
 export default {
   components: {
     ProductFilter,
     ProductItem,
     BasePagination,
+    BasePreloaderSmall,
   },
+  mixins: [loadingProcessMixin],
   data() {
     return {
       products: [],
@@ -96,13 +91,6 @@ export default {
 
       productsAmount: 0,
       productsAmountEnding: 'товаров',
-
-      pageIsLoading: false,
-      pageIsLoaded: true,
-
-      productsIsLoading: false,
-      productsIsLoaded: true,
-      productsLoadFault: false,
     };
   }, // data
   created() {
@@ -116,18 +104,14 @@ export default {
   },
   methods: {
     async loaderPage(arrRequests) {
-      this.pageIsLoading = true;
       this.pageIsLoaded = false;
 
       await Promise.all(arrRequests);
 
-      this.pageIsLoading = false;
       this.pageIsLoaded = true;
     },
     loadProducts() {
-      this.productsIsLoading = true;
-      this.productsIsLoaded = false;
-      this.productsLoadFault = false;
+      this.setProductLoadingVars(true, false, false);
 
       axios
         .get(`${API_BASE_URL}/products`, {
@@ -149,10 +133,7 @@ export default {
           this.productAmountEnding = setProductsAmountEnding(
             this.productsAmount
           );
-
-          this.productsIsLoading = false;
-          this.productsIsLoaded = true;
-          this.productsLoadFault = false;
+          this.setProductLoadingVars(false, true, false);
         })
         .catch((error) => {
           console.log(`load products - ${error.message}`);
@@ -161,9 +142,7 @@ export default {
           this.pagesAmount = 0;
           this.productAmountEnding = 'товаров';
 
-          this.productsIsLoading = false;
-          this.productsIsLoaded = false;
-          this.productsLoadFault = true;
+          this.setProductLoadingVars(false, false, true);
         });
     },
     loadColors() {
@@ -218,22 +197,5 @@ export default {
     },
   }, // methods
 };
-// TODO поставить условие isItemsReady = false, крутить спинер, когда данные загрузятся - поменять false на true, после начать отрисовку
+// TODO показать сообщение при отсутствии товаров после фильтрации
 </script>
-
-<style>
-.loader {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-}
-
-.loader__message {
-  position: relative;
-  left: 50%;
-  display: inline-block;
-  transform: translateX(-50%);
-}
-</style>

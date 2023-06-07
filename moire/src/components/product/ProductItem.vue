@@ -19,24 +19,26 @@
       <ProductItemColor
         v-for="(colorObj, index) in product.colors"
         :key="index"
-        :index="index"
+        :colorObjIndex="index"
         :color-obj="colorObj"
-        :pickedColor="pickedColor"
-        @picked="handlePickedColor"
+        v-model="pickedColorId"
+        @picked="setImgSrc"
       />
     </ul>
   </li>
 </template>
 <script>
-import ProductItemColor from '@/components/product/ProductItemColor.vue';
+import setImgSrcMixin from '@/mixins/set-img-src';
 import renderProductPrice from '@/helpers/render-product-price';
+import ProductItemColor from '@/components/product/ProductItemColor.vue';
 
 export default {
   components: { ProductItemColor },
+  mixins: [setImgSrcMixin],
   props: ['product'],
   data() {
     return {
-      pickedColor: this.product.colors[0].color.code,
+      pickedColorId: this.product.colors[0].id,
       imgSrc: null,
     };
   },
@@ -47,22 +49,6 @@ export default {
   },
   created() {
     this.setImgSrc(0);
-  },
-  methods: {
-    handlePickedColor({ value, indexColorObj }) {
-      this.setPickedColor(value);
-      this.setImgSrc(indexColorObj);
-    },
-    setPickedColor(value) {
-      this.pickedColor = value;
-    },
-    setImgSrc(indexColorObj = 0) {
-      if (this.product.colors[indexColorObj].gallery) {
-        this.imgSrc = this.product.colors[indexColorObj].gallery[0].file.url;
-      } else {
-        this.imgSrc = './img/product-img-temporary.jpg';
-      }
-    },
   },
 };
 </script>

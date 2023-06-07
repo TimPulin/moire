@@ -6,7 +6,7 @@
     :value="modelValue"
     @change="sendSelectedValue($event.target.value)"
   >
-    <option value="0" selected>Все категории</option>
+    <option v-if="show" value="0" selected>Все категории</option>
     <option
       v-for="item in list"
       :value="item.id"
@@ -18,7 +18,12 @@
 
 <script>
 export default {
-  props: ['list', 'selectName', 'modelValue'],
+  props: ['list', 'selectName', 'modelValue', 'isZeroOptionShow'],
+  computed: {
+    show() {
+      return this.isZeroOptionShow === undefined ? true : this.isZeroOptionShow;
+    },
+  },
   methods: {
     sendSelectedValue(value) {
       this.$emit('update:modelValue', Number(value));

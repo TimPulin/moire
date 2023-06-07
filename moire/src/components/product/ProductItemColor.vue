@@ -4,8 +4,8 @@
       <input
         class="colors__radio sr-only"
         type="radio"
-        :value="colorObj.color.code"
-        v-model="localPickedColor"
+        :value="colorObj.id"
+        v-model="currentColorId"
       />
       <span
         class="colors__value"
@@ -18,14 +18,15 @@
 
 <script>
 export default {
-  props: ['index', 'colorObj', 'pickedColor'],
+  props: ['colorObjIndex', 'colorObj', 'modelValue'],
   computed: {
-    localPickedColor: {
+    currentColorId: {
       get() {
-        return this.pickedColor;
+        return this.modelValue;
       },
       set(value) {
-        this.$emit('picked', { value, indexColorObj: this.index });
+        this.$emit('update:modelValue', value);
+        this.$emit('picked', this.colorObjIndex);
       },
     },
   }, // computed
