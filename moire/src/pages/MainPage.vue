@@ -24,31 +24,20 @@
         @submit-form-filter="loadProducts"
       />
 
-      <section class="catalog">
-        <BasePreloaderSmall
-          :productsIsLoading="productsIsLoading"
-          :productsLoadFault="productsLoadFault"
-        />
-
-        <ul v-if="productsIsLoaded" class="catalog__list">
-          <ProductItem
-            v-for="product in products"
-            :key="product.id"
-            :product="product"
-          />
-        </ul>
-
-        <BasePagination
-          :pages-amount="pagesAmount"
-          v-model:page-current="pageCurrent"
-          @paginate="loadProducts"
-        />
-      </section>
+      <SectionCatalog
+        :products-is-loading="productsIsLoading"
+        :products-load-fault="productsLoadFault"
+        :products-is-loaded="productsIsLoaded"
+        :products="products"
+        @paginate="loadProducts"
+      />
+      <!-- v-model:page-current="pageCurrent" -->
     </div>
   </div>
 </template>
 
 <script>
+import { computed } from 'vue';
 import axios from 'axios';
 import API_BASE_URL from '@/config';
 import loadingProcessMixin from '@/mixins/loading-process';
@@ -56,19 +45,22 @@ import loadingProcessMixin from '@/mixins/loading-process';
 import setProductsAmountEnding from '@/helpers/set-product-amount-ending';
 import formatObjectOfStrings from '@/helpers/format-object-of-strings';
 
+import SectionCatalog from '@/components/sections/SectionCatalog.vue';
 import ProductFilter from '@/components/product/ProductFilter.vue';
-import ProductItem from '@/components/product/ProductItem.vue';
-import BasePagination from '@/components/base/BasePagination.vue';
-import BasePreloaderSmall from '@/components/base/BasePreloaderSmall.vue';
 
 export default {
   components: {
     ProductFilter,
-    ProductItem,
-    BasePagination,
-    BasePreloaderSmall,
+    SectionCatalog,
   },
   mixins: [loadingProcessMixin],
+  provide() {
+    return {
+      pageCurrent: computed(() => this.pageCurrent),
+      pagesAmount: computed(() => this.pagesAmount),
+      changePageCurrent: this.changePageCurrent,
+    };
+  },
   data() {
     return {
       products: [],
@@ -103,11 +95,16 @@ export default {
     ]);
   },
   methods: {
+    changePageCurrent(value) {
+      this.pageCurrent = value;
+      this.loadProducts();
+      console.log(this.pageCurrent);
+    },
     async loaderPage(arrRequests) {
       this.pageIsLoaded = false;
 
       await Promise.all(arrRequests);
-
+      // TODO проверить ассинхроннсть этой функции
       this.pageIsLoaded = true;
     },
     loadProducts() {

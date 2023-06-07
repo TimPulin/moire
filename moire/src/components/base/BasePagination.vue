@@ -22,7 +22,7 @@
         href="#"
         class="pagination__link"
         :class="disablePageLink(pageNumber)"
-        @click.prevent="paginate(pageNumber)"
+        @click.prevent="changePageCurrent(pageNumber)"
       >
         {{ pageNumber }}
       </a>
@@ -45,7 +45,22 @@
 
 <script>
 export default {
-  props: ['pageCurrent', 'pagesAmount'], // methods
+  inject: {
+    pageCurrent: {
+      from: 'pageCurrent',
+      default: 0,
+    },
+    pagesAmount: {
+      from: 'pagesAmount',
+      default: 0,
+    },
+    changePageCurrent: {
+      from: 'changePageCurrent',
+    },
+  },
+  data() {
+    return {};
+  },
   methods: {
     isCurrent(pageNumber) {
       return this.pageCurrent === pageNumber;
@@ -63,18 +78,14 @@ export default {
     },
     priviousPage() {
       if (this.pageCurrent > 1) {
-        this.paginate(this.pageCurrent - 1);
+        this.changePageCurrent(this.pageCurrent - 1);
       }
     },
     nextPage() {
       if (this.pageCurrent < this.pagesAmount) {
-        this.paginate(this.pageCurrent + 1);
+        this.changePageCurrent(this.pageCurrent + 1);
       }
     },
-    paginate(pageCurrent) {
-      this.$emit('update:pageCurrent', pageCurrent);
-      this.$emit('paginate');
-    },
-  }, // computed
+  }, // methods
 };
 </script>
