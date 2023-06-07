@@ -31,16 +31,15 @@
         :products="products"
         @paginate="loadProducts"
       />
-      <!-- v-model:page-current="pageCurrent" -->
     </div>
   </div>
 </template>
 
 <script>
-import { computed } from 'vue';
 import axios from 'axios';
 import API_BASE_URL from '@/config';
 import loadingProcessMixin from '@/mixins/loading-process';
+import paginationConnectionMixin from '@/mixins/pagination-connection';
 
 import setProductsAmountEnding from '@/helpers/set-product-amount-ending';
 import formatObjectOfStrings from '@/helpers/format-object-of-strings';
@@ -53,14 +52,8 @@ export default {
     ProductFilter,
     SectionCatalog,
   },
-  mixins: [loadingProcessMixin],
-  provide() {
-    return {
-      pageCurrent: computed(() => this.pageCurrent),
-      pagesAmount: computed(() => this.pagesAmount),
-      changePageCurrent: this.changePageCurrent,
-    };
-  },
+  mixins: [loadingProcessMixin, paginationConnectionMixin],
+
   data() {
     return {
       products: [],
@@ -95,11 +88,6 @@ export default {
     ]);
   },
   methods: {
-    changePageCurrent(value) {
-      this.pageCurrent = value;
-      this.loadProducts();
-      console.log(this.pageCurrent);
-    },
     async loaderPage(arrRequests) {
       this.pageIsLoaded = false;
 
