@@ -37,7 +37,7 @@ export default {
   props: ['product'],
   data() {
     return {
-      pickedColorId: this.product.colors[0].id,
+      pickedColorId: this.product.colors[0].color.id,
       imgSrc: null,
     };
   },

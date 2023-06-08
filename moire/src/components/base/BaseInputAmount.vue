@@ -11,7 +11,7 @@
     </button>
 
     <input
-      name="count"
+      :name="inputName"
       class="input-amount"
       type="number"
       v-model.number="amount"
@@ -31,7 +31,13 @@
 
 <script>
 export default {
-  props: ['itemAmount'],
+  props: {
+    itemAmount: Number,
+    inputName: {
+      type: String,
+      default: 'quantity',
+    },
+  },
   data() {
     return {
       currentAmount: this.itemAmount,

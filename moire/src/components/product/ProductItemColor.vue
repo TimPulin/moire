@@ -4,7 +4,8 @@
       <input
         class="colors__radio sr-only"
         type="radio"
-        :value="colorObj.id"
+        :name="inputName"
+        :value="colorObj.color.id"
         v-model="currentColorId"
       />
       <span
@@ -18,7 +19,15 @@
 
 <script>
 export default {
-  props: ['colorObjIndex', 'colorObj', 'modelValue'],
+  props: {
+    colorObjIndex: Number,
+    colorObj: Object,
+    modelValue: Number,
+    inputName: {
+      type: String,
+      default: '',
+    },
+  },
   computed: {
     currentColorId: {
       get() {

@@ -21,7 +21,7 @@
         <h2 class="item__title">{{ product.title }}</h2>
 
         <div class="item__form">
-          <form class="form" action="#" method="POST">
+          <form class="form" method="POST" @submit.prevent="submitFormProduct">
             <div class="item__row item__row--center">
               <BaseInputAmount
                 v-model:item-amount="itemAmount"
@@ -37,6 +37,7 @@
                 <ul class="colors colors--black">
                   <ProductItemColor
                     v-for="(colorObj, index) in product.colors"
+                    input-name="colorId"
                     :key="index"
                     :colorObjIndex="index"
                     :color-obj="colorObj"
@@ -52,7 +53,7 @@
                   class="form__label form__label--small form__label--select"
                 >
                   <BaseSelect
-                    selectName="category"
+                    selectName="sizeId"
                     :list="product.sizes"
                     :isZeroOptionShow="false"
                     v-model="pickedSizeId"
@@ -98,13 +99,17 @@
 </template>
 
 <script>
-import axios from 'axios';
-import API_BASE_URL from '@/config';
+// import axios from 'axios';
+// import API_BASE_URL from '@/config';
+import axiosInstance from '@/helpers/axios-instance';
 
 import setImgSrcMixin from '@/mixins/set-img-src';
 import loadingProcessMixin from '@/mixins/loading-process';
 
 import renderProductPrice from '@/helpers/render-product-price';
+import // getUserAccessKeyFromLocalStorage,
+// setUserAccessKeyToLocalStorage,
+'@/helpers/local-storage-connection';
 
 import BaseBreadcrumbs from '@/components/base/BaseBreadcrumbs.vue';
 import BaseSelect from '@/components/base/BaseSelect.vue';
@@ -159,14 +164,14 @@ export default {
     loadProduct() {
       this.pageIsLoaded = false;
       this.setProductLoadingVars(true, false, false);
-      axios
-        .get(`${API_BASE_URL}/products/${this.$route.params.id}`)
+      axiosInstance
+        .get(`/products/${this.$route.params.id}`)
         .then((respose) => {
           this.product = respose.data;
           this.product.routeName = 'product';
           this.category = respose.data.category;
           this.category.routeName = 'category';
-          this.pickedColorId = respose.data.colors[0].id;
+          this.pickedColorId = respose.data.colors[0].color.id;
           this.pickedSizeId = respose.data.sizes[0].id;
           this.setImgSrc(0);
           this.setProductLoadingVars(false, true, false);
@@ -177,6 +182,36 @@ export default {
           this.product = {};
           this.setProductLoadingVars(false, false, true);
         });
+    },
+    sendProductToBasket(request) {
+      console.log(request);
+      // const userAccessKey = getUserAccessKeyFromLocalStorage();
+
+      axiosInstance.post(
+        '/baskets/products',
+        {
+          ...request,
+        },
+        {
+          params: {
+            // userAccessKey: userAccessKey,
+          },
+        }
+      );
+      //TODO добавить спинер на кнопку "В корзину", кнопку заблокировать до прихода ответа с сервера
+    },
+    submitFormProduct(event) {
+      const formData = new FormData(event.target);
+      formData.append('productId', this.product.id);
+
+      const formObj = Object.fromEntries(formData);
+      // for (let key in formObj) {
+      //   console.log(key);
+      // }
+      // const request = JSON.stringify(formObj);
+
+      this.sendProductToBasket(formObj);
+      // this.sendProductToBasket(request);
     },
   },
 };

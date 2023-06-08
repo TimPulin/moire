@@ -101,7 +101,7 @@ export default {
     },
     loadProducts() {
       this.setProductLoadingVars(true, false, false);
-
+      // TODO изменить на axiosInstance, импортировать его из helpers
       axios
         .get(`${API_BASE_URL}/products`, {
           params: {
@@ -116,7 +116,6 @@ export default {
           },
         })
         .then((response) => {
-          console.log(response.data);
           this.products = response.data.items;
           this.productsAmount = response.data.pagination.total;
           this.pagesAmount = response.data.pagination.pages;
