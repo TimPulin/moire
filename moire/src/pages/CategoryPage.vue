@@ -5,18 +5,15 @@
   />
 
   <div v-if="pageIsLoaded" class="content__top">
-    <BaseBreadcrumbs :arr-sections="[]" />
+    <BaseBreadcrumbs :arr-sections="[category]" />
 
     <div class="content__row">
-      <h1 class="content__title">{{ categoryName }}</h1>
+      <h1 class="content__title">{{ categoryTitle }}</h1>
       <span class="content__info">
         {{ productsAmount }} {{ productsAmountEnding }}
       </span>
     </div>
   </div>
-
-  <!-- <div class="content__top">
-  </div> -->
 
   <SectionCatalog
     :class="'catalog--category'"
@@ -48,7 +45,7 @@ export default {
   data() {
     return {
       products: {},
-      categoryName: '',
+      category: {},
 
       productsAmount: 0,
 
@@ -60,6 +57,9 @@ export default {
   computed: {
     productsAmountEnding() {
       return setProductsAmountEnding(this.productsAmount);
+    },
+    categoryTitle() {
+      return this.category?.title ? this.category.title : '';
     },
   },
   created() {
@@ -87,7 +87,7 @@ export default {
           this.productsAmount = response.data.pagination.total;
           this.pagesAmount = response.data.pagination.pages;
 
-          this.getCategoryName(this.products[0].id);
+          this.getCategory(this.products[0].id);
 
           this.setProductLoadingVars(false, true, false);
         })
@@ -100,17 +100,17 @@ export default {
           this.setProductLoadingVars(false, false, true);
         });
     },
-    async getCategoryName(id) {
+    async getCategory(id) {
       const promise = axios
         .get(`${API_BASE_URL}/products/${id}`)
         .then((respose) => {
-          return respose.data.category.title;
+          return respose.data.category;
         })
         .catch((error) => {
           console.log(error.message);
           return '';
         });
-      this.categoryName = await promise;
+      this.category = await promise;
     },
   },
 };
