@@ -138,7 +138,7 @@ export default {
   },
   computed: {
     productDescription() {
-      return this.product.content === ''
+      return this.product?.content === ''
         ? 'Описание продукта не нашли'
         : this.product.content;
     },
