@@ -12,18 +12,32 @@
         />
       </a>
 
-      <a class="header__tel" href="tel:8 800 600 90 09"> 8 800 600 90 09 </a>
-
-      <a class="header__cart" href="cart.html" aria-label="Корзина с товарами">
+      <a class="header__tel" type="tel" href="tel:8 800 600 90 09">
+        8 800 600 90 09
+      </a>
+      <router-link
+        class="header__cart"
+        aria-label="Корзина с товарами"
+        :to="{ name: 'cart' }"
+      >
         <svg width="19" height="24">
           <use xlink:href="#icon-cart" />
         </svg>
-        <span class="header__count" aria-label="Количество товаров">3</span>
-      </a>
+        <span class="header__count" aria-label="Количество товаров">
+          {{ cartItemAmount }}</span
+        >
+      </router-link>
     </div>
   </header>
 </template>
 
 <script>
-export default {};
+import { mapState } from 'vuex';
+export default {
+  computed: {
+    ...mapState({
+      cartItemAmount: 'cartItemAmount',
+    }),
+  },
+};
 </script>

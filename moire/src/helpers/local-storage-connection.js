@@ -1,11 +1,15 @@
-export { getUserAccessKeyFromLocalStorage, setUserAccessKeyToLocalStorage };
+export { getUserFromLocalStorage, setUserToLocalStorage };
+const emptyUser = {
+  id: null,
+  userAccessKey: '',
+};
 
-function getUserAccessKeyFromLocalStorage() {
-  return localStorage.getItem('userAccessKey')
-    ? localStorage.getItem('userAccessKey')
-    : '';
+function getUserFromLocalStorage() {
+  return localStorage.getItem('moireUser')
+    ? JSON.parse(localStorage.getItem('moireUser'))
+    : emptyUser;
 }
 
-function setUserAccessKeyToLocalStorage(userAccessKey) {
-  localStorage.set('userAccessKey', userAccessKey);
+function setUserToLocalStorage(user) {
+  localStorage.setItem('moireUser', JSON.stringify(user));
 }

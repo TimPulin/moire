@@ -1,7 +1,7 @@
 <template>
+  <!-- type="text" -->
   <select
     class="form__select"
-    type="text"
     :name="selectName"
     :value="modelValue"
     @change="sendSelectedValue($event.target.value)"

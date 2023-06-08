@@ -7,9 +7,15 @@ import { createStore } from 'vuex';
 // });
 
 export default createStore({
-  state: {},
+  state: {
+    cartItemAmount: 0,
+  },
   getters: {},
-  mutations: {},
+  mutations: {
+    updateCartItemAmount(amount) {
+      this.cartItemAmount = amount;
+    },
+  },
   actions: {},
   modules: {},
 });

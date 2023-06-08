@@ -23,10 +23,7 @@
         <div class="item__form">
           <form class="form" method="POST" @submit.prevent="submitFormProduct">
             <div class="item__row item__row--center">
-              <BaseInputAmount
-                v-model:item-amount="itemAmount"
-                @changeItemAmount="handleChangeItemAmount"
-              />
+              <BaseInputAmount v-model:item-amount="itemAmount" />
 
               <b class="item__price"> {{ productPriceTotal }} </b>
             </div>
@@ -99,17 +96,16 @@
 </template>
 
 <script>
-// import axios from 'axios';
-// import API_BASE_URL from '@/config';
 import axiosInstance from '@/helpers/axios-instance';
 
 import setImgSrcMixin from '@/mixins/set-img-src';
 import loadingProcessMixin from '@/mixins/loading-process';
 
 import renderProductPrice from '@/helpers/render-product-price';
-import // getUserAccessKeyFromLocalStorage,
-// setUserAccessKeyToLocalStorage,
-'@/helpers/local-storage-connection';
+import {
+  getUserFromLocalStorage,
+  setUserToLocalStorage,
+} from '@/helpers/local-storage-connection';
 
 import BaseBreadcrumbs from '@/components/base/BaseBreadcrumbs.vue';
 import BaseSelect from '@/components/base/BaseSelect.vue';
@@ -184,34 +180,34 @@ export default {
         });
     },
     sendProductToBasket(request) {
-      console.log(request);
-      // const userAccessKey = getUserAccessKeyFromLocalStorage();
+      // console.log(request);
+      const userAccessKey = getUserFromLocalStorage().accessKey;
 
-      axiosInstance.post(
-        '/baskets/products',
-        {
-          ...request,
-        },
-        {
-          params: {
-            // userAccessKey: userAccessKey,
+      axiosInstance
+        .post(
+          '/baskets/products',
+          {
+            ...request,
           },
-        }
-      );
+          {
+            params: {
+              userAccessKey: userAccessKey,
+            },
+          }
+        )
+        .then((response) => {
+          console.log(response.data.items);
+
+          if (userAccessKey === '') setUserToLocalStorage(response.data.user);
+        });
       //TODO добавить спинер на кнопку "В корзину", кнопку заблокировать до прихода ответа с сервера
     },
     submitFormProduct(event) {
       const formData = new FormData(event.target);
       formData.append('productId', this.product.id);
 
-      const formObj = Object.fromEntries(formData);
-      // for (let key in formObj) {
-      //   console.log(key);
-      // }
-      // const request = JSON.stringify(formObj);
-
-      this.sendProductToBasket(formObj);
-      // this.sendProductToBasket(request);
+      const data = Object.fromEntries(formData);
+      this.sendProductToBasket(data);
     },
   },
 };
