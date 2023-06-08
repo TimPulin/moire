@@ -44,8 +44,8 @@ import paginationConnectionMixin from '@/mixins/pagination-connection';
 import setProductsAmountEnding from '@/helpers/set-product-amount-ending';
 import formatObjectOfStrings from '@/helpers/format-object-of-strings';
 
-import SectionCatalog from '@/components/sections/SectionCatalog.vue';
 import ProductFilter from '@/components/product/ProductFilter.vue';
+import SectionCatalog from '@/components/sections/SectionCatalog.vue';
 
 export default {
   components: {
@@ -75,8 +75,12 @@ export default {
       pageLimit: 12,
 
       productsAmount: 0,
-      productsAmountEnding: 'товаров',
     };
+  },
+  computed: {
+    productsAmountEnding() {
+      return setProductsAmountEnding(this.productsAmount);
+    },
   }, // data
   created() {
     this.loaderPage([
@@ -112,6 +116,7 @@ export default {
           },
         })
         .then((response) => {
+          console.log(response.data);
           this.products = response.data.items;
           this.productsAmount = response.data.pagination.total;
           this.pagesAmount = response.data.pagination.pages;

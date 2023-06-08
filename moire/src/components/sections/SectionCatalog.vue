@@ -32,3 +32,9 @@ export default {
   ],
 };
 </script>
+
+<style>
+.catalog--category .catalog__list {
+  grid-template-columns: repeat(4, 270px);
+}
+</style>

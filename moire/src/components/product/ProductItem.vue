@@ -1,14 +1,8 @@
 <template>
   <li class="catalog__item">
-    <router-link
-      class="catalog__pic"
-      :to="{
-        name: 'product',
-        params: { id: product.id },
-      }"
-    >
+    <a href="#" @click.prevent="goToProductPage" class="catalog__pic">
       <img :src="imgSrc" :alt="product.title" />
-    </router-link>
+    </a>
 
     <h3 class="catalog__title">
       <a href="#" @click.prevent="goToProductPage"> {{ product.title }} </a>
@@ -57,8 +51,8 @@ export default {
   },
   methods: {
     async goToProductPage() {
-      const data = await this.loadProduct();
-      this.$router.push(`/${data.slug}/${this.product.slug}`);
+      const category = await this.loadProduct();
+      this.$router.push(`/${category.slug}/${this.product.slug}`);
     },
     loadProduct() {
       const promise = axios
