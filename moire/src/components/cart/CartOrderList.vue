@@ -9,7 +9,7 @@
         Доставка: <b>{{ localDeliveryPrice }}</b>
       </p>
       <p>
-        Итого: <b> {{ cartItemAmount }}</b> товара на сумму
+        Итого: <b> {{ cartItemAmount }}</b> {{ productsAmountEnding }} на сумму
         <b>{{ cartPriceTotal }}</b>
       </p>
     </div>
@@ -19,26 +19,41 @@
 
 <script>
 import formatPrice from '@/helpers/format-price';
+import setProductsAmountEnding from '@/helpers/set-product-amount-ending';
 import CartOrderItem from '@/components/cart/CartOrderItem.vue';
 
-import { mapState } from 'vuex';
 export default {
   components: { CartOrderItem },
   props: ['items', 'deliveryPrice'],
+  data() {
+    return { cartItemAmount: 0 };
+  },
   computed: {
-    ...mapState({
-      cartItemAmount: 'cartItemAmount',
-    }),
+    productsAmountEnding() {
+      return setProductsAmountEnding(this.cartItemAmount);
+    },
+
     cartPriceTotal() {
       const priceTotal = this.items.reduce((total, item) => {
         return total + item.price * item.quantity;
-      }, this.deliveryPrice);
+      }, Number(this.deliveryPrice));
       return formatPrice(priceTotal);
     },
     localDeliveryPrice() {
-      return this.deliveryPrice === 0
+      return Number(this.deliveryPrice) === 0
         ? 'бесплатно'
         : formatPrice(this.deliveryPrice);
+    },
+  },
+  created() {
+    this.calcCartItemAmount();
+  },
+  methods: {
+    calcCartItemAmount() {
+      this.cartItemAmount = this.items.length;
+      // this.cartItemAmount = this.items.reduce((total, item) => {
+      //   return total + item.quantity;
+      // }, 0);
     },
   },
 };

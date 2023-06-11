@@ -141,6 +141,7 @@ import BaseCheckboxOrder from '@/components/base/BaseCheckboxOrder.vue';
 import CartOrderList from '@/components/cart/CartOrderList.vue';
 
 import { mapState } from 'vuex';
+import { mapMutations } from 'vuex';
 
 export default {
   components: {
@@ -177,6 +178,7 @@ export default {
     this.pageLoader();
   },
   methods: {
+    ...mapMutations(['updateCurrentOrderId']),
     pageLoader() {
       this.pageIsLoaded = false;
       Promise.all([
@@ -203,6 +205,8 @@ export default {
         )
         .then((response) => {
           console.log(response);
+          this.updateCurrentOrderId(response.data.id);
+          this.$router.push('/cart/order-in-progress');
         })
         .catch((error) => {
           if (error.code === 'ERR_BAD_REQUEST') {
@@ -241,12 +245,6 @@ export default {
           console.log(error);
           return error;
         });
-    },
-    handleInputFormFocused(value) {
-      console.log(value);
-      if (value) {
-        value = '';
-      }
     },
   },
 };

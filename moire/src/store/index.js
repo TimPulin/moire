@@ -4,6 +4,7 @@ import { createStore } from 'vuex';
 export default createStore({
   state: {
     cartItemAmount: 0,
+    currentOrderId: null,
     user: {},
     accessKey: '',
   },
@@ -16,6 +17,9 @@ export default createStore({
     },
     setAccessKey(state, value) {
       state.accessKey = value;
+    },
+    updateCurrentOrderId(state, id) {
+      state.currentOrderId = id;
     },
   },
   // getters: {},

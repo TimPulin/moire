@@ -4,6 +4,7 @@ import CategoryPage from '@/pages/CategoryPage.vue';
 import ProductPage from '@/pages/ProductPage.vue';
 import CartPage from '@/pages/CartPage.vue';
 import OrderMakingPage from '@/pages/OrderMakingPage.vue';
+import OrderInProgressPage from '@/pages/OrderInProgressPage.vue';
 
 const routes = [
   {
@@ -30,6 +31,11 @@ const routes = [
     name: 'order-making',
     component: OrderMakingPage,
     path: '/cart/order-making',
+  },
+  {
+    name: 'order-in-progress',
+    component: OrderInProgressPage,
+    path: '/cart/order-in-progress',
   },
 ];
 
