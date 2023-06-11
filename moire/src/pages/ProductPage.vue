@@ -97,20 +97,19 @@
 
 <script>
 import axiosInstance from '@/helpers/axios-instance';
+import renderProductPrice from '@/helpers/render-product-price';
+import calcCartItemAmount from '@/helpers/calc-cart-item-amount';
 
 import setImgSrcMixin from '@/mixins/set-img-src';
 import loadingProcessMixin from '@/mixins/loading-process';
 
-import renderProductPrice from '@/helpers/render-product-price';
-import {
-  getUserFromLocalStorage,
-  setUserToLocalStorage,
-} from '@/helpers/local-storage-connection';
+import { mapState } from 'vuex';
+import { mapMutations } from 'vuex';
 
 import BaseBreadcrumbs from '@/components/base/BaseBreadcrumbs.vue';
+import BasePreloaderSmall from '@/components/base/BasePreloaderSmall.vue';
 import BaseSelect from '@/components/base/BaseSelect.vue';
 import ProductItemColor from '@/components/product/ProductItemColor.vue';
-import BasePreloaderSmall from '@/components/base/BasePreloaderSmall.vue';
 import BaseInputAmount from '@/components/base/BaseInputAmount.vue';
 import ProductTabs from '@/components/product/ProductTabs.vue';
 
@@ -138,6 +137,9 @@ export default {
     };
   },
   computed: {
+    ...mapState({
+      user: 'user',
+    }),
     productDescription() {
       return this.product?.content === ''
         ? 'Описание продукта не нашли'
@@ -157,6 +159,9 @@ export default {
   },
   // TODO проверить, нужен ли watch 'routre.params.id' для загрузки или изменения страницы
   methods: {
+    ...mapMutations({
+      updateCartItemAmount: 'updateCartItemAmount',
+    }),
     loadProduct() {
       this.pageIsLoaded = false;
       this.setProductLoadingVars(true, false, false);
@@ -180,9 +185,6 @@ export default {
         });
     },
     sendProductToBasket(request) {
-      // console.log(request);
-      const userAccessKey = getUserFromLocalStorage().accessKey;
-
       axiosInstance
         .post(
           '/baskets/products',
@@ -191,14 +193,13 @@ export default {
           },
           {
             params: {
-              userAccessKey: userAccessKey,
+              userAccessKey: this.user.accessKey,
             },
           }
         )
         .then((response) => {
-          console.log(response.data.items);
-
-          if (userAccessKey === '') setUserToLocalStorage(response.data.user);
+          const itemAmount = calcCartItemAmount(response.data.items);
+          this.updateCartItemAmount(itemAmount);
         });
       //TODO добавить спинер на кнопку "В корзину", кнопку заблокировать до прихода ответа с сервера
     },

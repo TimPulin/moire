@@ -1,21 +1,24 @@
 import { createStore } from 'vuex';
-// import axios from 'axios';
-// import API_BASE_URL from '@/config';
-
-// const axiosInstans = axios.create({
-//   baseURL: API_BASE_URL,
-// });
+// import axiosInstance from '@/helpers/axios-instance';
 
 export default createStore({
   state: {
     cartItemAmount: 0,
+    user: {},
+    accessKey: '',
   },
-  getters: {},
   mutations: {
-    updateCartItemAmount(amount) {
-      this.cartItemAmount = amount;
+    updateCartItemAmount(state, amount) {
+      state.cartItemAmount = amount;
+    },
+    setUser(state, user) {
+      state.user = Object.assign({}, user);
+    },
+    setAccessKey(state, value) {
+      state.accessKey = value;
     },
   },
-  actions: {},
-  modules: {},
+  // getters: {},
+  // actions: {},
+  // modules: {},
 });

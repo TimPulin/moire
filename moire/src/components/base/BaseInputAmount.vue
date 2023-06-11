@@ -41,6 +41,7 @@ export default {
   data() {
     return {
       currentAmount: this.itemAmount,
+      // TODO сделать get и set для currentAmount, обработать случай получения ''
     };
   },
   computed: {
